@@ -1,0 +1,9 @@
+@extends('layouts.app')
+@section('title','Rooms') @section('page-heading','Room Management')
+@section('content')
+<div class="page-toolbar"><form class="search-form filters" method="GET"><input name="search" value="{{ request('search') }}" placeholder="Search room number..."><select name="room_type_id"><option value="">All room types</option>@foreach($roomTypes as $type)<option value="{{ $type->id }}" @selected(request('room_type_id')==$type->id)>{{ $type->name }}</option>@endforeach</select><select name="status"><option value="">All statuses</option>@foreach(['available','occupied','maintenance'] as $s)<option value="{{ $s }}" @selected(request('status')==$s)>{{ ucfirst($s) }}</option>@endforeach</select><button class="btn btn-light">Filter</button></form><a class="btn btn-primary" href="{{ route('rooms.create') }}">+ Add Room</a></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Room No.</th><th>Type</th><th>Floor</th><th>Price / Night</th><th>Status</th><th>Description</th><th>Actions</th></tr></thead><tbody>
+@forelse($rooms as $room)<tr><td class="strong">{{ $room->room_number }}</td><td>{{ $room->roomType->name }}</td><td>{{ $room->floor }}</td><td>${{ number_format($room->price,2) }}</td><td><span class="status {{ $room->status }}">{{ ucfirst($room->status) }}</span></td><td>{{ Str::limit($room->description,35) }}</td><td class="actions"><a class="action-edit" href="{{ route('rooms.edit',$room) }}">Edit</a><form method="POST" action="{{ route('rooms.destroy',$room) }}" onsubmit="return confirm('Delete this room?')">@csrf @method('DELETE')<button class="action-delete">Delete</button></form></td></tr>
+@empty<tr><td colspan="7" class="empty">No rooms found.</td></tr>@endforelse
+</tbody></table></div><div class="pagination">{{ $rooms->links() }}</div></div>
+@endsection
